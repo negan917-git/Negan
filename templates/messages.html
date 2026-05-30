@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Сообщения{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Сообщения</h1>
+        <p class="page-subtitle">Просмотр и анализ всех сообщений</p>
+    </div>
+</div>
+<div class="filters-bar">
+    <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Поиск сообщений..." oninput="debounceSearch()">
+    </div>
+    <select id="sentimentFilter" onchange="loadMessages()">
+        <option value="">Все тональности</option>
+        <option value="positive">Позитивный</option>
+        <option value="neutral">Нейтральный</option>
+        <option value="negative">Негативный</option>
+    </select>
+    <select id="priorityFilter" onchange="loadMessages()">
+        <option value="">Все приоритеты</option>
+        <option value="low">Низкий</option>
+        <option value="medium">Средний</option>
+        <option value="high">Высокий</option>
+    </select>
+    <select id="categoryFilter" onchange="loadMessages()">
+        <option value="">Все категории</option>
+        <option value="general">Общее</option>
+        <option value="support">Поддержка</option>
+        <option value="technical">Техническое</option>
+        <option value="billing">Оплата</option>
+        <option value="service">Сервис</option>
+        <option value="complaint">Жалоба</option>
+        <option value="bug">Баг</option>
+        <option value="feature-request">Предложение</option>
+    </select>
+</div>
+<div id="messagesContainer" class="messages-list">
+    <div class="loading">Загрузка сообщений...</div>
+</div>
+<div class="pagination" id="pagination"></div>
+<script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+{% endblock %}

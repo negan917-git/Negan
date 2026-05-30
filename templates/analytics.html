@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Аналитика{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Аналитика</h1>
+        <p class="page-subtitle">Детальная статистика и отчёты</p>
+    </div>
+    <div class="export-buttons">
+        <button class="btn btn-sm btn-secondary" onclick="exportData('csv')">CSV</button>
+        <button class="btn btn-sm btn-secondary" onclick="exportData('excel')">Excel</button>
+        <button class="btn btn-sm btn-secondary" onclick="exportData('pdf')">PDF</button>
+    </div>
+</div>
+<div class="stats-grid analytics-kpis">
+    <div class="stat-card"><div class="stat-info"><p class="stat-label">Всего сообщений</p><h2 class="stat-value" id="analyticsTotalMessages">0</h2></div><div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div></div>
+    <div class="stat-card"><div class="stat-info"><p class="stat-label">Уровень негатива</p><h2 class="stat-value" id="analyticsNegativeRate">0%</h2></div><div class="stat-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg></div></div>
+    <div class="stat-card"><div class="stat-info"><p class="stat-label">Уровень жалоб</p><h2 class="stat-value" id="analyticsComplaintRate">0%</h2></div><div class="stat-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div></div>
+    <div class="stat-card"><div class="stat-info"><p class="stat-label">Активные боты</p><h2 class="stat-value" id="analyticsActiveBots">0</h2></div><div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/></svg></div></div>
+</div>
+<div class="charts-grid analytics-charts">
+    <div class="card"><div class="card-header"><h3>Тренд тональности</h3></div><div class="card-body chart-container"><canvas id="sentimentTrendChart"></canvas></div></div>
+    <div class="card"><div class="card-header"><h3>Распределение эмоций</h3></div><div class="card-body chart-container"><canvas id="emotionBreakdownChart"></canvas></div></div>
+    <div class="card"><div class="card-header"><h3>Категории жалоб</h3></div><div class="card-body chart-container"><canvas id="complaintCategoriesChart"></canvas></div></div>
+    <div class="card"><div class="card-header"><h3>Распределение приоритетов</h3></div><div class="card-body chart-container"><canvas id="priorityDistChart"></canvas></div></div>
+    <div class="card full-width"><div class="card-header"><h3>Сообщений в день</h3></div><div class="card-body chart-container"><canvas id="messagesPerDayChart"></canvas></div></div>
+</div>
+<div class="analytics-tables">
+    <div class="card"><div class="card-header"><h3>Топ категорий жалоб</h3></div><div class="card-body"><div id="topCategoriesTable"><div class="loading">Загрузка...</div></div></div></div>
+    <div class="card"><div class="card-header"><h3>Топ негативных пользователей</h3></div><div class="card-body"><div id="topNegativeUsersTable"><div class="loading">Загрузка...</div></div></div></div>
+</div>
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %}

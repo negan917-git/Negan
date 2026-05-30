@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Симуляция{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Симуляция</h1>
+        <p class="page-subtitle">Тестирование AI-анализа сообщений вручную</p>
+    </div>
+</div>
+<div class="simulate-container">
+    <div class="card">
+        <div class="card-header"><h3>Ввод сообщения</h3></div>
+        <div class="card-body">
+            <div class="form-group">
+                <label for="messageInput">Введите сообщение для анализа</label>
+                <textarea id="messageInput" rows="6" placeholder="Напишите сообщение пользователя для тестирования AI-анализа..."></textarea>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <button class="btn btn-primary" onclick="analyzeMessage()" id="analyzeBtn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    Анализировать
+                </button>
+                <span style="font-size:12px;color:var(--text-secondary)">или нажмите Ctrl+Enter</span>
+            </div>
+        </div>
+    </div>
+    <div class="card" id="resultCard" style="display:none;">
+        <div class="card-header"><h3>Результат анализа</h3></div>
+        <div class="card-body">
+            <div class="result-grid">
+                <div class="result-item">
+                    <span class="result-label">Тональность</span>
+                    <span class="result-value" id="resultSentiment">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Эмоция</span>
+                    <span class="result-value" id="resultEmotion">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Жалоба</span>
+                    <span class="result-value" id="resultComplaint">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Приоритет</span>
+                    <span class="result-value" id="resultPriority">-</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Категории</span>
+                    <span class="result-value" id="resultCategories">-</span>
+                </div>
+            </div>
+            <div class="result-summary">
+                <h4>Краткое описание</h4>
+                <p id="resultSummary">-</p>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/simulate.js') }}"></script>
+{% endblock %}

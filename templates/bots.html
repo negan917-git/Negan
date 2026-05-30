@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Подключение ботов{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Подключение ботов</h1>
+        <p class="page-subtitle">Подключите ваших Telegram-ботов для получения и анализа сообщений</p>
+    </div>
+    <button class="btn btn-primary" onclick="showConnectModal()">Подключить бота</button>
+</div>
+<div id="botsContainer" class="bots-grid">
+    <div class="loading">Загрузка ботов...</div>
+</div>
+<div id="connectModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Подключить нового бота</h3>
+            <button class="modal-close" onclick="hideConnectModal()">&times;</button>
+        </div>
+        <form id="connectBotForm">
+            <div class="form-group">
+                <label for="bot_name">Имя бота</label>
+                <input type="text" id="bot_name" name="bot_name" placeholder="Мой бот поддержки" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Telegram Username</label>
+                <input type="text" id="username" name="username" placeholder="@my_support_bot" required>
+            </div>
+            <div class="form-group">
+                <label for="token">Токен бота</label>
+                <input type="password" id="token" name="token" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" required>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="hideConnectModal()">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/bots.js') }}"></script>
+{% endblock %}

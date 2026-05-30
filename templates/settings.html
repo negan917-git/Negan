@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Настройки{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Настройки</h1>
+        <p class="page-subtitle">Управление аккаунтом и предпочтениями</p>
+    </div>
+</div>
+<div class="settings-container">
+    <div class="settings-tabs">
+        <button class="tab-btn active" data-tab="profile">Профиль</button>
+        <button class="tab-btn" data-tab="security">Безопасность</button>
+        <button class="tab-btn" data-tab="ai">Настройки AI</button>
+        <button class="tab-btn" data-tab="notifications">Уведомления</button>
+    </div>
+    <div class="settings-content">
+        <div class="tab-panel active" id="tab-profile">
+            <div class="card">
+                <div class="card-header"><h3>Информация профиля</h3></div>
+                <div class="card-body">
+                    <div class="avatar-section">
+                        <div class="avatar-preview">
+                            <img id="avatarPreview" src="{{ current_user.avatar or '/static/images/default-avatar.png' }}" alt="Аватар">
+                        </div>
+                        <label class="btn btn-secondary btn-sm">
+                            Загрузить фото
+                            <input type="file" id="avatarInput" accept="image/*" hidden onchange="uploadAvatar(this)">
+                        </label>
+                    </div>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="profileName">Полное имя</label>
+                            <input type="text" id="profileName" name="name" value="{{ current_user.name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" name="email" value="{{ current_user.email }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-panel" id="tab-security">
+            <div class="card">
+                <div class="card-header"><h3>Смена пароля</h3></div>
+                <div class="card-body">
+                    <form id="securityForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Текущий пароль</label>
+                            <input type="password" id="currentPassword" name="current_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Новый пароль</label>
+                            <input type="password" id="newPassword" name="new_password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Подтвердите новый пароль</label>
+                            <input type="password" id="confirmPassword" name="confirm_password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сменить пароль</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-panel" id="tab-ai">
+            <div class="card">
+                <div class="card-header"><h3>Конфигурация AI</h3></div>
+                <div class="card-body">
+                    <form id="aiForm">
+                        <div class="form-group">
+                            <label for="geminiApiKey">Gemini API Key</label>
+                            <input type="password" id="geminiApiKey" name="gemini_api_key" value="{{ current_user.gemini_api_key or '' }}" placeholder="Введите ваш Gemini API ключ">
+                            <small style="color:var(--text-secondary);font-size:11px;margin-top:4px;display:block">Получить ключ: <a href="https://aistudio.google.com/apikey" target="_blank" style="color:#2563EB">aistudio.google.com/apikey</a></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="geminiModel">Выбор модели</label>
+                            <select id="geminiModel" name="gemini_model">
+                                <option value="gemini-2.5-pro" {% if current_user.gemini_model == 'gemini-2.5-pro' %}selected{% endif %}>Gemini 2.5 Pro</option>
+                                <option value="gemini-2.5-flash" {% if current_user.gemini_model == 'gemini-2.5-flash' %}selected{% endif %}>Gemini 2.5 Flash</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap">
+                            <button type="submit" class="btn btn-primary">Сохранить настройки</button>
+                            <button type="button" class="btn btn-secondary" onclick="testGeminiConnection()" id="testGeminiBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                                Тест Gemini подключения
+                            </button>
+                        </div>
+                        <div id="geminiTestResult" style="margin-top:14px;display:none"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="tab-panel" id="tab-notifications">
+            <div class="card">
+                <div class="card-header"><h3>Настройки уведомлений</h3></div>
+                <div class="card-body">
+                    <form id="notificationsForm">
+                        <div class="toggle-group">
+                            <label class="toggle-label">
+                                <span>Email-уведомления</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" name="email_notifications" {% if current_user.email_notifications %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </label>
+                            <label class="toggle-label">
+                                <span>Оповещения о жалобах</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" name="complaint_alerts" {% if current_user.complaint_alerts %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </label>
+                            <label class="toggle-label">
+                                <span>Оповещения высокого приоритета</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" name="high_priority_alerts" {% if current_user.high_priority_alerts %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Сохранить предпочтения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}

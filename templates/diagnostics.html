@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Диагностика системы{% endblock %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Диагностика системы</h1>
+        <p class="page-subtitle">Состояние системы и обзор конфигурации</p>
+    </div>
+    <button class="btn btn-primary" onclick="refreshDiagnostics()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Обновить
+    </button>
+</div>
+<div id="diagnosticsContent">
+    <div class="loading">Загрузка диагностики...</div>
+</div>
+<style>
+.diag-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px; }
+.diag-card { background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden; }
+.diag-card-header { padding:16px 20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px; }
+.diag-card-body { padding:20px; }
+.diag-row { display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px; }
+.diag-row:last-child { border-bottom:none; }
+.diag-label { color:var(--text-secondary);font-weight:500; }
+.diag-value { font-weight:600; }
+.status-badge { padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+.status-badge.connected,.status-badge.ok { background:#dcfce7;color:#166534; }
+.status-badge.error,.status-badge.disconnected { background:#fef2f2;color:#991b1b; }
+.diag-models { margin-top:12px; }
+.diag-model-tag { display:inline-block;padding:3px 10px;background:#eff6ff;color:#1e40af;border-radius:20px;font-size:11px;font-weight:500;margin:3px; }
+@media(max-width:768px){.diag-grid{grid-template-columns:1fr;}}
+</style>
+<script>
+function refreshDiagnostics() {
+    const container = document.getElementById('diagnosticsContent');
+    container.innerHTML = '<div class="loading">Загрузка диагностики...</div>';
+    fetch('/api/system/diagnostics')
+        .then(r => r.json())
+        .then(d => renderDiagnostics(d))
+        .catch(() => { container.innerHTML = '<div class="empty-state"><p>Не удалось загрузить диагностику</p></div>'; });
+}
+
+function renderDiagnostics(d) {
+    const container = document.getElementById('diagnosticsContent');
+    container.innerHTML = `
+    <div class="diag-grid">
+        <div class="diag-card">
+            <div class="diag-card-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                Gemini AI
+                <span class="status-badge ${d.gemini.status === 'connected' ? 'ok' : 'error'}">${d.gemini.status}</span>
+            </div>
+            <div class="diag-card-body">
+                <div class="diag-row"><span class="diag-label">Статус</span><span class="diag-value">${d.gemini.message}</span></div>
+                <div class="diag-row"><span class="diag-label">Активная модель</span><span class="diag-value">${d.gemini.active_model}</span></div>
+                <div class="diag-row"><span class="diag-label">API Key настроен</span><span class="diag-value">${d.gemini.api_key_configured ? '✅ Да' : '❌ Нет'}</span></div>
+                ${d.gemini.error_type ? `<div class="diag-row"><span class="diag-label">Тип ошибки</span><span class="diag-value" style="color:#ef4444">${d.gemini.error_type}</span></div>` : ''}
+                ${d.gemini.available_models && d.gemini.available_models.length > 0 ? `
+                <div class="diag-row" style="flex-wrap:wrap">
+                    <span class="diag-label">Доступные модели</span>
+                    <div class="diag-models">${d.gemini.available_models.map(m => `<span class="diag-model-tag">${m}</span>`).join('')}</div>
+                </div>` : ''}
+            </div>
+        </div>
+        <div class="diag-card">
+            <div class="diag-card-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                База данных
+                <span class="status-badge ${d.database.status === 'connected' ? 'ok' : 'error'}">${d.database.status === 'connected' ? 'Подключено' : 'Отключено'}</span>
+            </div>
+            <div class="diag-card-body">
+                <div class="diag-row"><span class="diag-label">Статус</span><span class="diag-value">${d.database.status === 'connected' ? '✅ Подключено' : '❌ Отключено'}</span></div>
+                <div class="diag-row"><span class="diag-label">Тип</span><span class="diag-value">${d.database.type}</span></div>
+            </div>
+        </div>
+        <div class="diag-card">
+            <div class="diag-card-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+                Telegram
+                <span class="status-badge ${d.telegram.bots_connected > 0 ? 'ok' : 'connected'}">${d.telegram.bots_connected > 0 ? 'Активен' : 'Нет ботов'}</span>
+            </div>
+            <div class="diag-card-body">
+                <div class="diag-row"><span class="diag-label">Подключено ботов</span><span class="diag-value">${d.telegram.bots_connected}</span></div>
+                <div class="diag-row"><span class="diag-label">Всего сообщений</span><span class="diag-value">${d.telegram.total_messages}</span></div>
+            </div>
+        </div>
+        <div class="diag-card">
+            <div class="diag-card-header">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                Система
+            </div>
+            <div class="diag-card-body">
+                <div class="diag-row"><span class="diag-label">Версия Python</span><span class="diag-value">${d.system.python_version}</span></div>
+                <div class="diag-row"><span class="diag-label">SDK</span><span class="diag-value">google-generativeai</span></div>
+            </div>
+        </div>
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', refreshDiagnostics);
+</script>
+{% endblock %}
