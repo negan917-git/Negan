@@ -1,41 +1,99 @@
-{% extends "base.html" %}
-{% block title %}Подключение ботов{% endblock %}
-{% block content %}
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Подключение ботов</h1>
-        <p class="page-subtitle">Подключите ваших Telegram-ботов для получения и анализа сообщений</p>
-    </div>
-    <button class="btn btn-primary" onclick="showConnectModal()">Подключить бота</button>
-</div>
-<div id="botsContainer" class="bots-grid">
-    <div class="loading">Загрузка ботов...</div>
-</div>
-<div id="connectModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Подключить нового бота</h3>
-            <button class="modal-close" onclick="hideConnectModal()">&times;</button>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartSentiment - Подключение ботов</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">P</div>
+            <span class="logo-text">SmartSentiment</span>
         </div>
-        <form id="connectBotForm">
-            <div class="form-group">
-                <label for="bot_name">Имя бота</label>
-                <input type="text" id="bot_name" name="bot_name" placeholder="Мой бот поддержки" required>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <span>Панель управления</span>
+            </a>
+            <a href="bots.html" class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+                <span>Подключение ботов</span>
+            </a>
+            <a href="messages.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Сообщения</span>
+            </a>
+            <a href="analytics.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Аналитика</span>
+            </a>
+            <a href="simulate.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                <span>Симуляция</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Настройки</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="diagnostics.html" class="nav-item" style="font-size:12px;opacity:0.5;">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+                <span>Диагностика</span>
+            </a>
+            <a href="index.html" class="nav-item logout">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Выход</span>
+            </a>
+        </div>
+    </aside>
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Подключение ботов</h1>
+                <p class="page-subtitle">Подключите ваших Telegram-ботов для получения и анализа сообщений</p>
             </div>
-            <div class="form-group">
-                <label for="username">Telegram Username</label>
-                <input type="text" id="username" name="username" placeholder="@my_support_bot" required>
+            <button class="btn btn-primary" onclick="showConnectModal()">Подключить бота</button>
+        </div>
+        <div id="botsContainer" class="bots-grid">
+            <div class="loading">Загрузка ботов...</div>
+        </div>
+        <div id="connectModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Подключить нового бота</h3>
+                    <button class="modal-close" onclick="hideConnectModal()">&times;</button>
+                </div>
+                <form id="connectBotForm">
+                    <div class="form-group">
+                        <label for="bot_name">Имя бота</label>
+                        <input type="text" id="bot_name" name="bot_name" placeholder="Мой бот поддержки" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Telegram Username</label>
+                        <input type="text" id="username" name="username" placeholder="@my_support_bot" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="token">Токен бота</label>
+                        <input type="password" id="token" name="token" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" required>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="hideConnectModal()">Отмена</button>
+                        <button type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label for="token">Токен бота</label>
-                <input type="password" id="token" name="token" placeholder="123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11" required>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="hideConnectModal()">Отмена</button>
-                <button type="submit" class="btn btn-primary">Сохранить</button>
-            </div>
-        </form>
-    </div>
+        </div>
+    </main>
 </div>
-<script src="{{ url_for('static', filename='js/bots.js') }}"></script>
-{% endblock %}
+<div id="toast-container"></div>
+<script src="js/main.js"></script>
+<script src="js/bots.js"></script>
+</body>
+</html>
